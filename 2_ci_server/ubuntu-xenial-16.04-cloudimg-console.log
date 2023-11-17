@@ -753,4 +753,9 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDkn9DiMTdSxDko7LPnieOhj3o3c5iaG+BXWylAT274
 
 Ubuntu 16.04.7 LTS ubuntu-xenial ttyS0
 
-ubuntu-xenial login: 
+ubuntu-xenial login: [ 1833.397386] Out of memory: Kill process 32532 (bundle) score 267 or sacrifice child
+[ 1833.399499] Killed process 32532 (bundle) total-vm:2226516kB, anon-rss:1079848kB, file-rss:0kB
+[ 1939.047213] Out of memory: Kill process 2567 (bundle) score 250 or sacrifice child
+[ 1939.049789] Killed process 2567 (bundle) total-vm:1773196kB, anon-rss:1009812kB, file-rss:0kB
+[ 2877.459808] Out of memory: Kill process 2742 (bundle) score 256 or sacrifice child
+[ 2877.464681] Killed process 2742 (bundle) total-vm:1937476kB, anon-rss:1033296kB, file-rss:0kB

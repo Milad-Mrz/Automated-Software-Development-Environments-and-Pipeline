@@ -44,16 +44,23 @@ while true; do
 	fi
 done
 
+
+echo "Initialising all environments... (~15 min)"
 # Initialising Developer env.	--------------------------------------------
-echo "Initialising Developer env."
+echo "1-Developer env."
 gnome-terminal -- bash -c './scripts/1_dev_env.sh; exec bash'  &
 
 # Initialising staging env.		--------------------------------------------
-echo "Initialising staging env."
+echo "2-Staging env."
 gnome-terminal -- bash -c './scripts/3_stg_env.sh; exec bash'  &
 
 # Initialising Production env.	--------------------------------------------
-echo "Initialising Production env."
+echo "3-Production env."
 gnome-terminal -- bash -c './scripts/4_pro_env.sh; exec bash'  &
 
-echo "all environments are running"
+clear
+echo -e " \n\n System is running... \n\n" 
+echo -e "GitLab: http://192.168.56.9/gitlab/users/sign_in"
+
+sleep 30 
+exit
