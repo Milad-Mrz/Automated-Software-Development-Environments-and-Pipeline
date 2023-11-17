@@ -47,12 +47,6 @@ The run.sh script is a Bash script for setting up and initializing a development
 
 
 ```bash
-./test.sh
-```
-This test.sh script continuously checks the status of a CI server by sending HTTP requests to a specified URL. It waits for the server to return an HTTP status code of 200, indicating that the CI server is running. If the server is not running, it waits for a few seconds and then checks again in a loop until the server becomes available.
-
-
-```bash
 ./close.sh
 ```
 This Bash script seems to perform the following actions:
