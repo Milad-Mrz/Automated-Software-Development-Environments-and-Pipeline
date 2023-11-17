@@ -8,13 +8,19 @@ Product_url="http://192.168.56.96:8106/"
 http_status=""
 
 clear
-sudo touch "/home/vagrant/shared/flag_staging"
+#sudo touch "/home/vagrant/shared/flag_staging"
 echo -e "Staging Env:\n\n"
 echo "checking staging flag..."
 
 while true; do
     # Read the content of the flag file
-    flag_content=$(cat $FLAG_FILE)
+    if [ -e "$FLAG_FILE" ]; then
+    # File exists, read its content
+        flag_content=$(cat "$FLAG_FILE")
+    else
+    # File doesn't exist, set flag_content to zero or any other default value
+        flag_content=0
+    fi
 
     # test 1: Check if the content is equal to "1"
     if [ "$flag_content" == "1" ]; then
@@ -64,6 +70,7 @@ while true; do
                 sudo touch "/home/vagrant/shared/flag_production"
                 sudo echo "1" > "/home/vagrant/shared/flag_production"
                 echo "Production flag set to 1."
+                sudo rm "/home/vagrant/shared/flag_staging"
                 break
             else                
                 sleep 5

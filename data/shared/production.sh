@@ -7,13 +7,19 @@ http_status=""
 
 clear
 
-sudo touch "/home/vagrant/shared/flag_production"
+#sudo touch "/home/vagrant/shared/flag_production"
 echo -e "Production Env:\n\n"
 echo "checking production flag..."
 
 while true; do
     # Read the content of the flag file
-    flag_content=$(cat $FLAG_FILE)
+    if [ -e "$FLAG_FILE" ]; then
+    # File exists, read its content
+        flag_content=$(cat "$FLAG_FILE")
+    else
+    # File doesn't exist, set flag_content to zero or any other default value
+        flag_content=0
+    fi
 
     # Check if the content is equal to "1"
     if [ "$flag_content" == "1" ]; then
@@ -51,7 +57,7 @@ while true; do
         sleep 60 
         sudo nohup bash -c 'cd /home/vagrant/frontend/ && python3 -m http.server 8107'  & 
         clear
-        echo "running the front-end..."
+        echo "running the front-end...(~2 minutes)"
 
         while true; do
             http_status=$(curl -s -o /dev/null -w "%{http_code}" $Product_url)
@@ -64,7 +70,7 @@ while true; do
                 # Echo "0" back into the flag file
                 sudo echo "0" > "/home/vagrant/shared/flag_production"
                 echo "Flag set to 0."
-
+                sudo rm "/home/vagrant/shared/flag_production"
 
                 break
             else        
