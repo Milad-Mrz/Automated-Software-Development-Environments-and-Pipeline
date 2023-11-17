@@ -51,7 +51,7 @@ while true; do
         sleep 60 
         sudo nohup bash -c 'cd /home/vagrant/frontend/ && python3 -m http.server 8107'  & 
         clear
-        echo "update the jar file and restart the product"
+        echo "running the front-end..."
 
         while true; do
             http_status=$(curl -s -o /dev/null -w "%{http_code}" $Product_url)
