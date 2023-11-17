@@ -23,17 +23,6 @@ echo "checking for dependencies"
 # Check Ansible version
 current_version=$(ansible --version | awk -F '[[:space:]]+' '/ansible/ {print $2; exit}')
 
-# Desired Ansible version
-desired_version="2.9.1"
-
-if [ "$current_version" == "$desired_version" ]; then
-    echo "Ansible is installed with version $desired_version"
-else
-	
-    echo "Ansible version $desired_version is not installed."
-
-fi
-
 #Initialising CI server			--------------------------------------------
 echo "Initialising CI server"
 gnome-terminal -- bash -c './scripts/2_ci_server.sh; exec bash'  &
@@ -41,16 +30,17 @@ gnome-terminal -- bash -c './scripts/2_ci_server.sh; exec bash'  &
 Product_url="http://192.168.56.9/gitlab/users/sign_in"
 http_status=""
 
+echo "Waiting for the CI server to start... (~30 min)"
+
 # Use a while loop to repeatedly check if the Product is running
 while true; do
 	http_status=$(curl -s -o /dev/null -w "%{http_code}" $Product_url)
 	if [ "$http_status" == "200" ] ; then
+		clear
 		echo "CI server is running. HTTP Status: $http_status"
 		break
 	else
-		clear
-		echo "Waiting for the CI server to start..."
-		sleep 5
+		sleep 30
 	fi
 done
 
@@ -66,4 +56,4 @@ gnome-terminal -- bash -c './scripts/3_stg_env.sh; exec bash'  &
 echo "Initialising Production env."
 gnome-terminal -- bash -c './scripts/4_pro_env.sh; exec bash'  &
 
-echo "system is idle"
+echo "all environments are running"

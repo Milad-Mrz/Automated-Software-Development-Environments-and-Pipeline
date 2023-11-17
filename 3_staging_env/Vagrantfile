@@ -1,13 +1,15 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
+# staging
+
 
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/xenial64"
-  config.vm.hostname = "production-env-e4l"
+  config.vm.hostname = "staging-env-e4l"
   
   ENV['LC_ALL']="en_US.UTF-8"
-  config.vm.network "forwarded_port", guest: 8080, host: 8087
-  config.vm.network "private_network", ip: "192.168.56.97"
+  config.vm.network "forwarded_port", guest: 8080, host: 8086
+  config.vm.network "private_network", ip: "192.168.56.96"
   config.vm.synced_folder "../data/shared", "/home/vagrant/shared"
 
   config.vm.provider "virtualbox" do |vb|
@@ -92,9 +94,9 @@ Vagrant.configure("2") do |config|
 
     sudo apt-get install --yes python
 
-    sudo cp /home/vagrant/shared/production.sh /home/vagrant/production.sh
-    chmod +x /home/vagrant/production.sh
-    sudo /home/vagrant/production.sh
+    sudo cp /home/vagrant/shared/staging.sh /home/vagrant/staging.sh
+    chmod +x /home/vagrant/staging.sh
+    sudo /home/vagrant/staging.sh
   
     SHELL
 end  
