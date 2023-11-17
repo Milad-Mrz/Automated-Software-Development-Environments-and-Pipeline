@@ -1,0 +1,1 @@
+{"virtualbox":{"/vagrant_data":{"guestpath":"/vagrant_data","hostpath":"/home/louis/Dev/git/SE_pipeline/ci_server/data","disabled":false,"__vagrantfile":true},"/vagrant":{"guestpath":"/vagrant","hostpath":"/home/louis/Dev/git/SE_pipeline/stage_env","disabled":false,"__vagrantfile":true}}}

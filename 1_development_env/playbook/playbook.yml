@@ -1,0 +1,26 @@
+# vim: ts=2
+---
+- hosts: all
+  remote_user: vagrant
+  become: yes
+  become_method: sudo
+    
+  
+  vars:
+    vHome: /home/vagrant
+    local_directory: ../../data/e4l
+    remote_directory: /home/vagrant/e4l
+    gitlab_private_token: "ypCa3Dzb2365nvsixwPP"
+
+  tasks:  
+    - name: Create artefact-repository directory
+      file:
+        path: /home/vagrant/artefact-repository
+        state: directory
+        mode: 0777
+
+    - name: Transfer the provision scripts to automate the process
+      copy: src=../scripts dest=/home/vagrant/ mode=0777
+
+    - name: Run the repository setup script.
+      command: sh /home/vagrant/scripts/setup-repository.sh

@@ -1,0 +1,32 @@
+# vim: ts=2
+---
+- hosts: all
+  remote_user: vagrant
+  become: yes
+  become_method: sudo
+    
+  
+  vars:
+    vHome: /home/vagrant
+    local_directory: ../../data/e4l
+    remote_directory: /home/vagrant/e4l
+    gitlab_private_token: "ypCa3Dzb2365nvsixwPP"
+
+  tasks:
+    - include_role:
+        name: gitlab
+
+    - include_role:
+        name: docker
+
+    - name: Create GitLab integration-shell runner
+      become: yes
+      shell: |
+        sudo gitlab-runner register \
+          --non-interactive \
+          --url "http://192.168.56.9/gitlab" \
+          --r "{{ gitlab_runner_token }}" \
+          --description "integration runner" \
+          --tag-list "integration-shell" \
+          --executor "shell" \
+          --run-untagged="true" 

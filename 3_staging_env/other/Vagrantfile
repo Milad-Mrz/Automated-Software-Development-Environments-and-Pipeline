@@ -1,0 +1,84 @@
+# -*- mode: ruby -*-
+#
+# vi: set ft=ruby :
+# vim: ts=2
+
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+ 
+  config.vm.box = "ubuntu/xenial64"
+  config.vm.hostname = "stage-vm"
+  config.vm.box_download_insecure = false 
+  
+  ENV['LC_ALL']="en_US.UTF-8"
+  
+
+  config.vm.network :private_network, ip: "192.168.56.7"
+
+  config.vm.synced_folder "../2_ci_server/data", "/vagrant_data"
+
+  config.vm.provider :virtualbox do |vb|
+   
+    vb.customize [
+      'modifyvm', :id,
+      '--natdnshostresolver1', 'on',
+      '--memory', '8192',
+      '--cpus', '2'
+    ]
+    
+  end  
+  
+  config.vm.provision "shell", inline: <<-SHELL
+     	sudo apt-get update
+
+	echo "Install default Java and OpenJDK"
+  sudo apt install default-jre -y
+  sudo apt-get install openjdk-8-jdk -y
+  
+  echo "Install MySql server"
+  export DEBIAN_FRONTEND="noninteractive"
+  sudo debconf-set-selections <<< "mysql-server mysql-server/root_password password 12345678"
+  sudo debconf-set-selections <<< "mysql-server mysql-server/root_password_again password 12345678"
+  sudo apt-get install -y mysql-server
+  sudo apt-get install make
+  
+  # Install Node.js 15.14.0
+  curl -fsSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | sudo gpg --dearmor -o /usr/share/keyrings/nodesource-archive-keyring.gpg
+  echo "deb [signed-by=/usr/share/keyrings/nodesource-archive-keyring.gpg] https://deb.nodesource.com/node_15.x bionic main" | sudo tee /etc/apt/sources.list.d/nodesource.list
+  echo "deb-src [signed-by=/usr/share/keyrings/nodesource-archive-keyring.gpg] https://deb.nodesource.com/node_15.x bionic main" | sudo tee -a /etc/apt/sources.list.d/nodesource.list
+  sudo apt-get update
+  sudo apt-get install -y nodejs
+  
+   sudo apt-get update
+      sudo apt-get install --yes python
+      # apt-get install -y default-jre
+    # apt-get install -y apache2
+    
+    sudo apt-get install gitlab-rails
+    
+    sudo apt-get install curl
+  curl -sS https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.deb.sh | sudo bash
+  sudo apt-get install gitlab-ee
+
+  curl -L https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh | sudo bash
+
+  sudo apt-get install gitlab-runner
+
+	gitlab_runner_token=$(cat /vagrant_data/token.txt)
+  	sudo apt-get update
+
+  sudo gitlab-runner register \
+      --non-interactive \
+      --url "http://192.168.56.9/gitlab" \
+      --r "$gitlab_runner_token" \
+      --description "staging" \
+      --tag-list "integration-shell" \
+      --executor "shell" \
+      --run-untagged="true"
+
+
+   	SHELL
+   
+  
+end
