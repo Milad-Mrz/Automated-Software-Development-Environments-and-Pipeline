@@ -46,12 +46,12 @@ deploy:
     tags:
     - integration-shell
     script:
-    - sudo cp -rf lu.uni.e4l.platform.api.dev/build/libs/*.jar /home/vagrant/shared/
-    - sudo echo "1" > /home/vagrant/shared/flag_staging
+    - cp -rf lu.uni.e4l.platform.api.dev/build/libs/*.jar /home/vagrant/shared/
+    - echo "1" > /home/vagrant/shared/flag_staging
 
 frontend_deploy:
     stage: frontend-deploy
     tags:
     - integration-shell
     script:
-    - sudo cp -rf lu.uni.e4l.platform.frontend.dev/e4l.frontend/web/dist/* /home/vagrant/shared/frontend
+    - cp -rf lu.uni.e4l.platform.frontend.dev/e4l.frontend/web/dist/* /home/vagrant/shared/frontend
