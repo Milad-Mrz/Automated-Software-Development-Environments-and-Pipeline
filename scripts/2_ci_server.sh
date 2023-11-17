@@ -1,5 +1,6 @@
 #!/bin/bash
 
+clear
 echo "Starting CI-Server"
 cd 2_ci_server
 

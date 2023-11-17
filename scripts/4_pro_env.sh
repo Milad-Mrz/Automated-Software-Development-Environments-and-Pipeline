@@ -1,5 +1,6 @@
 #!/bin/bash
 
+clear
 echo "Starting Production Env."
 cd 4_production_env
 

@@ -50,7 +50,7 @@ while true; do
         sudo sed -i 's/_index2\.default\.defaults\.baseURL = "http:\/\/192\.168\..*:\([0-9]\+\)\/e4lapi";/_index2.default.defaults.baseURL = "http:\/\/192.168.56.96:8080\/e4lapi";/' /home/vagrant/frontend/js/main.js
 
         # Echo "0" back into the flag file
-        sudo echo "0" > $FLAG_FILE
+        #sudo echo "0" > $FLAG_FILE
         echo "staging flag set to 0."
 
         # Check if the Product is running
@@ -67,7 +67,7 @@ while true; do
                 echo -e " \n\n"
                 echo "Staging is compelete (http status: $http_status)"
                 echo -e " \n\n"
-                sudo touch "/home/vagrant/shared/flag_production"
+                # sudo touch "/home/vagrant/shared/flag_production"
                 sudo echo "1" > "/home/vagrant/shared/flag_production"
                 echo "Production flag set to 1."
                 sudo rm "/home/vagrant/shared/flag_staging"

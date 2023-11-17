@@ -68,7 +68,7 @@ while true; do
                 echo -e " \n\n"
                 echo -e " \n\n"
                 # Echo "0" back into the flag file
-                sudo echo "0" > "/home/vagrant/shared/flag_production"
+                #sudo echo "0" > "/home/vagrant/shared/flag_production"
                 echo "Flag set to 0."
                 sudo rm "/home/vagrant/shared/flag_production"
 
