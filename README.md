@@ -8,7 +8,7 @@
 ### Group Members
 - Louis Weber - 019087433A
 - Milad Mirzaei - 0210941626
-- Asad Uzzaman Noor - 022147662E
+- Md Asad Uzzaman Noor - 022147662E
 
 ### How to Run the Project
 ```bash
