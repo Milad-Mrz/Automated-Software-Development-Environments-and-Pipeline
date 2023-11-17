@@ -159,5 +159,5 @@ The production environment is successfully executed.
 - Running the application for end-users.
 
 ## Main Success Scenario
-- open the product in your browser using 192.168.33.94:8080
+- open the product in your browser using 192.168.56.94:8080
 

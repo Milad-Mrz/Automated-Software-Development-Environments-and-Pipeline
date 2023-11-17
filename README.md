@@ -28,7 +28,7 @@ The `run.sh` script automates the setup by performing the following steps:
 
 1. **Turning Off Virtual Machines**: Ensures that any running Vagrant virtual machines are turned off.
 2. **Restarting Ports**: Restarts ports 8080 to 8088, resolving potential conflicts with other programs.
-3. **Initializing CI Server**: Launches the CI server script (`2_ci_server.sh`) in the background. The CI server monitors the staging environment's status, waiting for an HTTP status code of 200. It then proceeds to make HTTP requests to specific URLs (`http://192.168.33.9/gitlab`, development environment, etc.).
+3. **Initializing CI Server**: Launches the CI server script (`2_ci_server.sh`) in the background. The CI server monitors the staging environment's status, waiting for an HTTP status code of 200. It then proceeds to make HTTP requests to specific URLs (`http://192.168.56.9/gitlab`, development environment, etc.).
 4. **Managing Environments**: After each commit, the development environment (`1_dev_env.sh`) is relaunched, and the product is redeployed on the staging environment (`3_stg_env.sh`). The CI server monitors a flag to confirm completion of each deployment.
 5. **Activating Production Environment**: Once the flag is positive (equal to 1), the production and staging environments (`4_pro_env.sh`) are activated. This involves copying the compiled JAR file from the CI server through a shared file, running tests, and releasing the production environment after passing HTTP status tests.
 
