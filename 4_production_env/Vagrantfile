@@ -3,7 +3,7 @@
 
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/xenial64"
-  config.vm.hostname = "dev-env-e4l"
+  config.vm.hostname = "production-env-e4l"
   
   ENV['LC_ALL']="en_US.UTF-8"
   config.vm.network "forwarded_port", guest: 8083, host: 8087
@@ -30,7 +30,12 @@ Vagrant.configure("2") do |config|
     sudo apt-get install -y nodejs
   
     sudo apt-get install --yes python
+
+    mkdir /home/vagrant/released_version
+    sudo cp /home/vagrant/shared/production.sh /home/vagrant/production.sh
+    chmod +x /home/vagrant/production.sh
+    sudo ./home/vagrant/production.sh
   
-   SHELL
+    SHELL
 end  
 

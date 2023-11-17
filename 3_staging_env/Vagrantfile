@@ -3,7 +3,7 @@
 
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/xenial64"
-  config.vm.hostname = "dev-env-e4l"
+  config.vm.hostname = "staging-env-e4l"
   
   ENV['LC_ALL']="en_US.UTF-8"
   config.vm.network "forwarded_port", guest: 8083, host: 8086
@@ -28,9 +28,14 @@ Vagrant.configure("2") do |config|
     echo "deb-src [signed-by=/usr/share/keyrings/nodesource-archive-keyring.gpg] https://deb.nodesource.com/node_15.x bionic main" | sudo tee -a /etc/apt/sources.list.d/nodesource.list
     sudo apt-get update
     sudo apt-get install -y nodejs
-  
     sudo apt-get install --yes python
+
+    mkdir /home/vagrant/latest_version
+    sudo cp /home/vagrant/shared/staging.sh /home/vagrant/staging.sh
+    chmod +x /home/vagrant/staging.sh
+    sudo ./home/vagrant/staging.sh
+
   
-   SHELL
+    SHELL
 end  
 
