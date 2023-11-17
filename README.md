@@ -46,3 +46,22 @@ The run.sh script is a Bash script for setting up and initializing a development
 11. Print Success Message:Finally, it prints a message indicating that the product is running.
 
 
+```bash
+./test.sh
+```
+This test.sh script continuously checks the status of a CI server by sending HTTP requests to a specified URL. It waits for the server to return an HTTP status code of 200, indicating that the CI server is running. If the server is not running, it waits for a few seconds and then checks again in a loop until the server becomes available.
+
+
+```bash
+./close.sh
+```
+This Bash script seems to perform the following actions:
+
+1. Halt Running Vagrant Machines:It uses the vagrant global-status command to identify running VirtualBox machines and halts them.
+
+2. Restart Ports (8080, 8081, 8082):It checks if ports 8080, 8081, and 8082 are in use using the lsof -i command.
+If any of the ports are in use, it terminates the processes using those ports with fuser -k.
+
+3. Display Messages:It prints messages indicating that the website has been closed. It informs the user that the terminal will be closed in 10 seconds.
+
+4. Sleep and Close Terminal:It waits for 10 seconds using the sleep command. It then uses pkill to forcefully terminate any processes.
