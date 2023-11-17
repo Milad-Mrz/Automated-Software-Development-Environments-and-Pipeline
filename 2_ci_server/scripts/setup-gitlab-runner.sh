@@ -5,12 +5,10 @@ config_content=$(cat <<EOF
 image: gradle:6.7.1
 
 stages:
-  - build
-  - test
-  - upload
-  - deploy
+  - backend-build
+  - backend-test
+  - backend-deploy
   - frontend-build
-  - frontend-upload
   - frontend-deploy
 
 cache:
@@ -19,7 +17,7 @@ cache:
     - lu.uni.e4l.platform.api.dev/.gradle/
 
 build_app:
-  stage: build
+  stage: backend-build
   script:
     - cd lu.uni.e4l.platform.api.dev/
     - ./gradlew wrapper
@@ -32,7 +30,7 @@ build_app:
     - lu.uni.e4l.platform.api.dev/build/libs/*.jar
 
 test_app:
-  stage: test
+  stage: backend-test
   script:
     - cd lu.uni.e4l.platform.api.dev/
     - ./gradlew test
@@ -42,31 +40,25 @@ build_frontend:
   script:
     - cd lu.uni.e4l.platform.frontend.dev/
     - npm run build
-
-frontend_upload:
-    stage: frontend-upload
-    tags:
-    - integration
-    script:
-    - echo "Deploy review app"
-    artifacts:
+  artifacts:
         name: "frontend"
         paths:
         - lu.uni.e4l.platform.frontend.dev/e4l.frontend/web/dist/*
 
 deploy:
-    stage: deploy
+    stage: backend-deploy
     tags:
     - integration-shell
     script:
-    - cp lu.uni.e4l.platform.api.dev/build/libs/*.jar /home/vagrant/artefact-repository
+    - cp -rf lu.uni.e4l.platform.api.dev/build/libs/*.jar /home/vagrant/shared/
+    - echo "1" > /home/vagrant/shared/flag_staging
 
 frontend_deploy:
     stage: frontend-deploy
     tags:
     - integration-shell
     script:
-    - cp -r lu.uni.e4l.platform.frontend.dev/e4l.frontend/web/dist/* /home/vagrant/artefact-repository/frontend
+    - cp -rf lu.uni.e4l.platform.frontend.dev/e4l.frontend/web/dist/* /home/vagrant/shared/frontend
 
 
 EOF

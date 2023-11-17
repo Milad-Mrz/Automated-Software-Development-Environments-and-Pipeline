@@ -29,7 +29,7 @@ Vagrant.configure("2") do |config|
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
   # NOTE: This will enable public access to the opened port
-  config.vm.network "forwarded_port", guest: 8083, host: 8084
+  config.vm.network "forwarded_port", guest: 8088, host: 1234
   #config.vm.network "forwarded_port", guest: 8088, host: 8080
 
   # Create a forwarded port mapping which allows access to a specific port
@@ -39,7 +39,7 @@ Vagrant.configure("2") do |config|
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
-  config.vm.network "private_network", ip: "192.168.56.91"
+  config.vm.network "private_network", ip: "192.168.56.94"
 
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
@@ -50,10 +50,8 @@ Vagrant.configure("2") do |config|
   # the path on the host to the actual folder. The second argument is
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
-  config.vm.synced_folder "../data/e4l/lu.uni.e4l.platform.api.dev", "/home/vagrant/lu.uni.e4l.platform.api.dev"
-  config.vm.synced_folder "../data/e4l/lu.uni.e4l.platform.frontend.dev", "/home/vagrant/lu.uni.e4l.platform.frontend.dev"
-
-  
+  config.vm.synced_folder "../2_ci_server/data", "/vagrant_data"
+  config.vm.synced_folder "../data/shared", "/home/vagrant/shared"
 
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
@@ -66,12 +64,8 @@ Vagrant.configure("2") do |config|
   
       # Customize the amount of memory on the VM:
         vb.memory = "4096"
-        #vb.memory = "16284"
-        #vb.memory = "24284"
-
-
-    	vb.cpus = 2
-   end
+    	  vb.cpus = 2
+  end
   
   # View the documentation for the provider you are using for more
   # information on available options.
@@ -81,54 +75,39 @@ Vagrant.configure("2") do |config|
   # documentation for more information about their specific syntax and use.	
   
   config.vm.provision "shell", inline: <<-SHELL
-  sudo apt-get update
-	     
-	echo "Install default Java and OpenJDK"
-	sudo apt install default-jre -y
-	sudo apt-get install openjdk-8-jdk -y
-	
-	echo "Install MySql server"
-	export DEBIAN_FRONTEND="noninteractive"
-	sudo debconf-set-selections <<< "mysql-server mysql-server/root_password password 12345678"
-	sudo debconf-set-selections <<< "mysql-server mysql-server/root_password_again password 12345678"
-	sudo apt-get install -y mysql-server
-	sudo apt-get install make
-	
-	# Install Node.js 15.14.0
-	curl -fsSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | sudo gpg --dearmor -o /usr/share/keyrings/nodesource-archive-keyring.gpg
-	echo "deb [signed-by=/usr/share/keyrings/nodesource-archive-keyring.gpg] https://deb.nodesource.com/node_15.x bionic main" | sudo tee /etc/apt/sources.list.d/nodesource.list
-	echo "deb-src [signed-by=/usr/share/keyrings/nodesource-archive-keyring.gpg] https://deb.nodesource.com/node_15.x bionic main" | sudo tee -a /etc/apt/sources.list.d/nodesource.list
-	sudo apt-get update
-	sudo apt-get install -y nodejs
-	
-	# Install Gradle 6.7.1
-	sudo apt-get install -y wget unzip
-	wget https://services.gradle.org/distributions/gradle-6.7.1-bin.zip
-	sudo mkdir /opt/gradle
-	sudo unzip -d /opt/gradle gradle-6.7.1-bin.zip
-	echo 'export PATH=$PATH:/opt/gradle/gradle-6.7.1/bin' | sudo tee -a /home/vagrant/.bashrc
-	echo 'export PATH=$PATH:/opt/gradle/gradle-6.7.1/bin' | sudo tee -a /root/.bashrc
-	source ~/.bashrc
-	
-	# Specify database location and credentials in application.properties
-	echo "spring.datasource.url=jdbc:mysql://localhost:3306/e4l" | sudo tee -a /lu.uni.e4l.platform.api.dev/src/main/resources/application.properties
-	echo "spring.datasource.username=root" | sudo tee -a /lu.uni.e4l.platform.api.dev/src/main/resources/application.properties
-	echo "spring.datasource.password=12345678" | sudo tee -a /lu.uni.e4l.platform.api.dev/src/main/resources/application.properties
-	echo "spring.datasource.url=jdbc:mysql://localhost:3306/e4l?serverTimezone=UTC" | sudo tee -a /lu.uni.e4l.platform.api.dev/src/main/resources/application.properties
-	
-	# Create the database "e4l" in MySQL
-	mysql -u root -p12345678 -e "CREATE DATABASE e4l;"
+      sudo apt-get update
+      sudo apt-get install -y nodejs
+  
+      sudo apt-get install --yes python
+      
+      sudo apt-get install gitlab-rails
+      
+      sudo apt-get install curl
+      curl -sS https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.deb.sh | sudo bash
+      sudo apt-get install gitlab-ee
 
-  sudo apt-get install --yes python
-  	
-  SHELL
+      curl -L https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh | sudo bash
+
+      sudo apt-get install gitlab-runner
+     
+
+      gitlab_runner_token=$(cat /vagrant_data/token.txt)
+      sudo apt-get update
+
+      sudo gitlab-runner register \
+        --non-interactive \
+        --url "http://192.168.56.9/gitlab" \
+        --r "$gitlab_runner_token" \
+        --description "staging" \
+        --tag-list "integration-shell" \
+        --executor "shell" \
+        --run-untagged="true"
+    SHELL
    
   config.vm.provision "ansible" do |ansible|
     	ansible.playbook = "./playbook/playbook.yml"
 	ansible.compatibility_mode = "auto"
   end
-  
+   
+   
 end
-  
-  
-

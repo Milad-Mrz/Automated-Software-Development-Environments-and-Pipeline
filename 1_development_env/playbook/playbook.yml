@@ -10,17 +10,73 @@
     vHome: /home/vagrant
     local_directory: ../../data/e4l
     remote_directory: /home/vagrant/e4l
-    gitlab_private_token: "ypCa3Dzb2365nvsixwPP"
 
-  tasks:  
-    - name: Create artefact-repository directory
-      file:
-        path: /home/vagrant/artefact-repository
-        state: directory
-        mode: 0777
+  tasks:
+    - include_role:
+        name: gitlab
 
-    - name: Transfer the provision scripts to automate the process
-      copy: src=../scripts dest=/home/vagrant/ mode=0777
+    - include_role:
+        name: docker
 
-    - name: Run the repository setup script.
-      command: sh /home/vagrant/scripts/setup-repository.sh
+    - name: Reconfigure and restart GitLab
+      command:
+        cmd: gitlab-ctl reconfigure && gitlab-ctl restart unicorn && gitlab-ctl restart
+    
+    - name: Clone Git repository
+      git:
+        repo: http://vagrant:12345678@192.168.56.9/gitlab/vagrant/e4l.git
+        dest: /home/vagrant/e4l
+
+    - name: Set Git user email
+      command: git config --global user.email "vagrant@vagrant.com"
+
+    - name: Set Git user name
+      command: git config --global user.name "Vagrant"
+    # - name: Transfer the provision scripts to automate the process
+    #  copy: src=../scripts dest=/home/vagrant/ mode=0777
+
+    #- name: Create ssh connection
+    #  command: sh /home/vagrant/scripts/ssh-connection.sh
+
+    #- name: Create deploy script
+    #  command: sh /home/vagrant/scripts/deploy-proc.sh
+
+    # - name: Synchronize files
+    #   synchronize:
+    #     src: ../../data/e4l
+    #     dest: /home/vagrant/
+
+    # - name: Run the gitlab configuration script.
+    #   command: sh /home/vagrant/scripts/configure-gitlab.sh
+
+    # #- name: Run the docker configuration script.
+    # #  command: sh /home/vagrant/scripts/configure-docker.sh
+
+    # - name: Run the repository setup script.
+    #   command: sh /home/vagrant/scripts/setup-repository.sh
+
+    # - name: Retrieve GitLab runner registration token using GitLab Rails
+    #   shell: sudo gitlab-rails runner -e production "puts Gitlab::CurrentSettings.current_application_settings.runners_registration_token"
+    #   register: gitlab_runner_registration_token_result
+
+    # - name: Store GitLab runner registration token
+    #   set_fact:
+    #     gitlab_runner_token: "{{ gitlab_runner_registration_token_result.stdout }}"
+    
+    # - name: Create GitLab integration-shell runner
+    #   become: yes
+    #   shell: |
+    #     sudo gitlab-runner register \
+    #       --non-interactive \
+    #       --url "http://192.168.56.9/gitlab" \
+    #       --r "{{ gitlab_runner_token }}" \
+    #       --description "integration runner" \
+    #       --tag-list "integration-shell" \
+    #       --executor "shell" \
+    #       --run-untagged="true" 
+
+    # - name: Run the gitlab runner setup script.
+    #   command: sh /home/vagrant/scripts/setup-gitlab-runner.sh  
+
+    # - name: Create the shared folder file if it doesn't exist
+    #   shell: sudo echo "{{ gitlab_runner_token }}" > /vagrant_data/token.txt

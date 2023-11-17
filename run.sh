@@ -1,6 +1,23 @@
 #!/bin/bash
-echo "turning off all vagrant machines..."
+echo "closing all running vagrant virtual machines in 10 seconds...   (ctrl+C to stop)"
+sleep 10
 vagrant global-status --prune | awk '/virtualbox.*running/ {print $1}' | xargs -L1 vagrant halt
+
+# List of ports to restart
+ports=(8080 8081 8082 8083 8084 8085 8086 8087 8088)
+
+echo "Restarting ports: ${ports[@]}"
+
+# Loop through the list of ports
+for port in "${ports[@]}"; do
+    echo "Restarting port $port..."
+    
+    # Check if the port is in use and kill the process
+    lsof -i :$port && fuser -k $port/tcp
+done
+
+echo "Ports restarted."
+
 
 #checking for dependencies
 echo "checking for dependencies"
@@ -18,100 +35,36 @@ else
 
 fi
 
-
-
-
-
-# List of ports to restart
-ports=(8080 8081 8082)
-
-echo "Restarting ports: ${ports[@]}"
-
-# Loop through the list of ports
-for port in "${ports[@]}"; do
-    echo "Restarting port $port..."
-    
-    # Check if the port is in use and kill the process
-    lsof -i :$port && fuser -k $port/tcp
-done
-
-echo "Ports restarted."
-
-
-
-
-#---------------------------------------------------------------------------------------------------
-echo "Initialising Developer and CI server..."
-
-# Run in background
-gnome-terminal -- bash -c './scripts/1_dev_env.sh; exec bash'  &
+#Initialising CI server			--------------------------------------------
+echo "Initialising CI server"
 gnome-terminal -- bash -c './scripts/2_ci_server.sh; exec bash'  &
 
-backend_url="http://192.168.56.9/gitlab/users/sign_in"
+Product_url="http://192.168.56.9/gitlab/users/sign_in"
 http_status=""
-WAIT_SECONDS=5
 
-# Use a while loop to repeatedly check if the backend is running
+# Use a while loop to repeatedly check if the Product is running
 while true; do
-	http_status=$(curl -s -o /dev/null -w "%{http_code}" $backend_url)
+	http_status=$(curl -s -o /dev/null -w "%{http_code}" $Product_url)
 	if [ "$http_status" == "200" ] ; then
 		echo "CI server is running. HTTP Status: $http_status"
 		break
 	else
 		clear
 		echo "Waiting for the CI server to start..."
-		sleep $WAIT_SECONDS
+		sleep 5
 	fi
 done
 
-#---------------------------------------------------------------------------------------------------
-echo "Initialising staging..."
+# Initialising Developer env.	--------------------------------------------
+echo "Initialising Developer env."
+gnome-terminal -- bash -c './scripts/1_dev_env.sh; exec bash'  &
+
+# Initialising staging env.		--------------------------------------------
+echo "Initialising staging env."
 gnome-terminal -- bash -c './scripts/3_stg_env.sh; exec bash'  &
 
-# Check if the backend is running
-backend_url="http://localhost:8081/e4l"
-http_status=""
-WAIT_SECONDS=5
-
-# Use a while loop to repeatedly check if the backend is running
-while true; do
-	http_status=$(curl -s -o /dev/null -w "%{http_code}" $backend_url)
-	if [ "$http_status" == "200" ] ; then
-		echo "Product is running. HTTP Status: $http_status"
-		break
-	else
-		clear
-		echo "Waiting for the product to run on staging environment..."
-		sleep $WAIT_SECONDS
-	fi
-done
-
-
-clear
-echo "Product is running."
-echo "Opening firefox ..."
-firefox "http://0.0.0.0:8081/"
-
-
-#---------------------------------------------------------------------------------------------------
-echo "Initialising the product..."
+# Initialising Production env.	--------------------------------------------
+echo "Initialising Production env."
 gnome-terminal -- bash -c './scripts/4_pro_env.sh; exec bash'  &
 
-# Check if the backend is running
-backend_url="http://localhost:8081/e4l"
-http_status=""
-WAIT_SECONDS=5
-
-# Use a while loop to repeatedly check if the backend is running
-while true; do
-	http_status=$(curl -s -o /dev/null -w "%{http_code}" $backend_url)
-	if [ "$http_status" == "200" ] ; then
-		echo "product is running. HTTP Status: $http_status"
-		break
-	else
-		clear
-		echo "Waiting for the backend to start..."
-		sleep $WAIT_SECONDS
-	fi
-done
-
+echo "system is idle"

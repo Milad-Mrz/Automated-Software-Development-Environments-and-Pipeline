@@ -2,6 +2,13 @@
 
 # Step 1: Use a while loop to repeatedly to check the flag_production
 FLAG_FILE="/home/vagrant/shared/flag_production"
+Product_url="http://localhost:8081/e4l"
+http_status=""
+
+
+
+touch 
+echo "checking production flag..."
 
 while true; do
     # Read the content of the flag file
@@ -16,16 +23,35 @@ while true; do
         pkill -f e4l-server.jar
 
         # Step 3: Copy the new JAR file from the shared folder
-        sudo cp /home/vagrant/shared/e4l-server.jar /home/vagrant/released_version/e4l-server.jar
+        sudo cp /home/vagrant/shared/e4l-server.jar /home/vagrant/product.jar
         sudo rm /home/vagrant/shared/e4l-server.jar
 
         # Step 4: Run the Java application
-        chmod +x /home/vagrant/released_version/e4l-server.jar
-        java -jar /home/vagrant/released_version/e4l-server.jar
+        chmod +x /home/vagrant/product.jar
+        java -jar /home/vagrant/product.jar
 
-        # Echo "0" back into the flag file
-        echo "0" > $FLAG_FILE
-        echo "Flag set to 0."
+        # Check if the Product is running
+        
+
+        # Use a while loop to repeatedly check if the Product is running
+        while true; do
+            http_status=$(curl -s -o /dev/null -w "%{http_code}" $Product_url)
+            if [ "$http_status" == "200" ] ; then
+                echo "product is running. HTTP Status: $http_status"
+                # Echo "0" back into the flag file
+                echo "0" > "/home/vagrant/shared/flag_production"
+                echo "Flag set to 0."
+
+
+                break
+            else
+                clear
+                echo "Waiting for the Product to start..."
+                sleep 5
+            fi
+        done
+
+
     fi
 
     # Sleep for 10 seconds
