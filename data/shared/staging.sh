@@ -7,8 +7,9 @@ FLAG_PRD="/home/vagrant/shared/flag_production"
 Product_url="http://192.168.56.96:8106/"
 http_status=""
 
-
-
+clear
+sudo touch "/home/vagrant/shared/flag_staging"
+echo -e "Staging Env:\n\n"
 echo "checking staging flag..."
 
 while true; do
@@ -18,37 +19,50 @@ while true; do
     # test 1: Check if the content is equal to "1"
     if [ "$flag_content" == "1" ]; then
         # Perform test here
-        #echo "perform the smoke tests"
+        echo "restart ports, back-end and front-end"
         
-		pkill -f stage.jar
+        # kill jar
+		sudo pkill -f stage.jar
+        # kill server and port
+        sudo pkill -f "python3 -m http.server 8106"
+        # reset ports
+        ports=(8080 8081 8106 8107)
+        # Loop through the list of ports
+        for port in "${ports[@]}"; do
+            sudo lsof -i :$port && fuser -k $port/tcp
+        done
 
 		# Step 4: Copy the new JAR file from the shared folder
 		sudo cp /home/vagrant/shared/e4l-server.jar /home/vagrant/stage.jar
         sudo cp -r /home/vagrant/shared/frontend /home/vagrant/frontend
 
 		# Step 5: Run the Java application
-		chmod +x /home/vagrant/stage.jar
-        gnome-terminal -- bash -c 'java -jar /home/vagrant/stage.jar.jar'  &
+		sudo chmod +x /home/vagrant/stage.jar
+        sudo nohup bash -c 'java -jar /home/vagrant/stage.jar.jar'  &
 		 
-        sed -i 's/PUBLIC_PATH//g' /home/vagrant/frontend/index.html
-        sed -i 's/_index2\.default\.defaults\.baseURL = "http:\/\/192\.168\..*:\([0-9]\+\)\/e4lapi";/_index2.default.defaults.baseURL = "http:\/\/192.168.56.96:8080\/e4lapi";/' /home/vagrant/frontend/js/main.js
+        sudo sed -i 's/PUBLIC_PATH//g' /home/vagrant/frontend/index.html
+        sudo sed -i 's/_index2\.default\.defaults\.baseURL = "http:\/\/192\.168\..*:\([0-9]\+\)\/e4lapi";/_index2.default.defaults.baseURL = "http:\/\/192.168.56.96:8080\/e4lapi";/' /home/vagrant/frontend/js/main.js
 
         # Echo "0" back into the flag file
-        echo "0" > $FLAG_FILE
-        echo "Staging flag set to 0."
+        sudo echo "0" > $FLAG_FILE
+        echo "staging flag set to 0."
 
         # Check if the Product is running
         # Use a while loop to repeatedly check if the Product is running
-        echo "Waiting for the product to run on staging environment..."
-        sleep 120
-        cd /home/vagrant/frontend/ && python3 -m http.server 8106
+        echo "perform the smoke tests for back-end... (~2 minutes)"
+        sleep 60
+        sudo nohup bash -c 'cd /home/vagrant/frontend/ && python3 -m http.server 8106'  &
+        clear
+        echo "perform the smoke tests for front-end (~2 minutes)"
 
         while true; do
             http_status=$(curl -s -o /dev/null -w "%{http_code}" $Product_url)
             if [ "$http_status" == "200" ] ; then
-                echo "staging is running. LINK: $Product_url"
-                touch "/home/vagrant/shared/flag_production"
-                echo "1" > "/home/vagrant/shared/flag_production"
+                echo -e " \n\n"
+                echo "Staging is compelete (http status: $http_status)"
+                echo -e " \n\n"
+                sudo touch "/home/vagrant/shared/flag_production"
+                sudo echo "1" > "/home/vagrant/shared/flag_production"
                 echo "Production flag set to 1."
                 break
             else                
