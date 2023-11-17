@@ -112,3 +112,6 @@
     - name: Permission artefact-repository folder 2
       shell: sudo addgroup gitlab-runner vagrant
 
+    - name: Run the repository setup script 2
+      command: sh /home/vagrant/scripts/setup-repository.sh
+

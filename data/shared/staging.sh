@@ -4,7 +4,7 @@
 FLAG_FILE="/home/vagrant/shared/flag_staging"
 FLAG_PRD="/home/vagrant/shared/flag_production"
 
-Product_url="http://localhost:8081/e4l"
+Product_url="http://192.168.56.96:8081/PUBLIC_PATH/calculator"
 http_status=""
 
 
@@ -36,6 +36,7 @@ while true; do
 
         # Check if the Product is running
         # Use a while loop to repeatedly check if the Product is running
+        echo "Waiting for the product to run on staging environment..."
         while true; do
             http_status=$(curl -s -o /dev/null -w "%{http_code}" $Product_url)
             if [ "$http_status" == "200" ] ; then
@@ -44,9 +45,7 @@ while true; do
                 echo "1" > "/home/vagrant/shared/flag_production"
                 echo "Production flag set to 1."
                 break
-            else
-                clear
-                echo "Waiting for the product to run on staging environment..."
+            else                
                 sleep 5
             fi
         done

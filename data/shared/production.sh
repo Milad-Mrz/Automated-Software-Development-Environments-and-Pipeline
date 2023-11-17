@@ -2,12 +2,12 @@
 
 # Step 1: Use a while loop to repeatedly to check the flag_production
 FLAG_FILE="/home/vagrant/shared/flag_production"
-Product_url="http://localhost:8081/e4l"
+Product_url="http://192.168.56.97:8081/PUBLIC_PATH/calculator"
 http_status=""
 
 
 
-touch 
+touch "/home/vagrant/shared/flag_production"
 echo "checking production flag..."
 
 while true; do
@@ -34,6 +34,8 @@ while true; do
         
 
         # Use a while loop to repeatedly check if the Product is running
+        echo "Waiting for the Product to run..."
+
         while true; do
             http_status=$(curl -s -o /dev/null -w "%{http_code}" $Product_url)
             if [ "$http_status" == "200" ] ; then
@@ -44,9 +46,7 @@ while true; do
 
 
                 break
-            else
-                clear
-                echo "Waiting for the Product to start..."
+            else        
                 sleep 5
             fi
         done

@@ -4,4 +4,4 @@ echo "Starting Production Env."
 cd 4_production_env
 
 # Run `vagrant up` command
-vagrant destroy && vagrant up
+vagrant destroy -f && vagrant up

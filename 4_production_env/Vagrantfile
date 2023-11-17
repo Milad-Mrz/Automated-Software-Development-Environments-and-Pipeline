@@ -11,32 +11,90 @@ Vagrant.configure("2") do |config|
   config.vm.synced_folder "../data/shared", "/home/vagrant/shared"
 
   config.vm.provider "virtualbox" do |vb|
-        vb.memory = "1024"
+        vb.memory = "2024"
     	  vb.cpus = 2
    end
 
   
    config.vm.provision "shell", inline: <<-SHELL
-    sudo apt-get update
-  
-    # Install default JRE for running Java applications
-    sudo apt-get install default-jre -y
-  
-    # Install Node.js 15.14.0
-    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | sudo gpg --dearmor -o /usr/share/keyrings/nodesource-archive-keyring.gpg
-    echo "deb [signed-by=/usr/share/keyrings/nodesource-archive-keyring.gpg] https://deb.nodesource.com/node_15.x bionic main" | sudo tee /etc/apt/sources.list.d/nodesource.list
-    echo "deb-src [signed-by=/usr/share/keyrings/nodesource-archive-keyring.gpg] https://deb.nodesource.com/node_15.x bionic main" | sudo tee -a /etc/apt/sources.list.d/nodesource.list
-    sudo apt-get update
-    sudo apt-get install -y nodejs
-  
-    sudo apt-get install --yes python
+   sudo apt-get update
+   echo "Install default Java and OpenJDK"
+   sudo apt install default-jre -y
+   sudo apt-get install openjdk-8-jdk -y
+   
+   echo "Install MySql server"
+   export DEBIAN_FRONTEND="noninteractive"
+   sudo debconf-set-selections <<< "mysql-server mysql-server/root_password password 12345678"
+   sudo debconf-set-selections <<< "mysql-server mysql-server/root_password_again password 12345678"
+   sudo apt-get install -y mysql-server
+   sudo apt-get install make
 
-    echo "Install MySql server"
-    export DEBIAN_FRONTEND="noninteractive"
-    sudo debconf-set-selections <<< "mysql-server mysql-server/root_password password 12345678"
-    sudo debconf-set-selections <<< "mysql-server mysql-server/root_password_again password 12345678"
-    sudo apt-get install -y mysql-server
-    sudo apt-get install make
+   #------------------------------------------------------------
+
+   echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+   sudo apt-get update
+   sudo apt-get install -y curl unzip
+   sudo apt-get install build-essential -y
+   sudo apt-get install python -y
+   sudo apt-get install python3 -y
+
+
+   # Install specific Node.js and npm versions
+   # check next 3 lines for automation errors
+   
+   curl -sL https://deb.nodesource.com/setup_15.x | sudo -E bash -
+   sudo apt-get install -y nodejs
+   sudo apt-get install -y npm
+
+   # Check Node.js and npm versions
+   node -v
+   npm -v
+
+   # Install Yarn (optional) with a specific version
+   npm install -g yarn
+
+   # Navigate to your front-end project directory
+   cd /home/vagrant/front-end
+
+   # Install project dependencies
+   npm install
+   npm rebuild node-sass
+
+   
+   # Configure the .env file
+   echo "API_URL=http://192.168.56.97:8080/e4lapi/" >> .env
+
+   #---------------------------------------------------------------------------
+   
+   # Install Node.js 15.14.0
+   #curl -fsSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | sudo gpg --dearmor -o /usr/share/keyrings/nodesource-archive-keyring.gpg
+   #echo "deb [signed-by=/usr/share/keyrings/nodesource-archive-keyring.gpg] https://deb.nodesource.com/node_15.x bionic main" | sudo tee /etc/apt/sources.list.d/nodesource.list
+   #echo "deb-src [signed-by=/usr/share/keyrings/nodesource-archive-keyring.gpg] https://deb.nodesource.com/node_15.x bionic main" | sudo tee -a /etc/apt/sources.list.d/nodesource.list
+   #sudo apt-get install -y nodejs
+   
+   # Install Gradle 6.7.1
+   sudo apt-get install -y wget unzip
+   wget https://services.gradle.org/distributions/gradle-6.7.1-bin.zip
+   sudo mkdir /opt/gradle
+   sudo unzip -d /opt/gradle gradle-6.7.1-bin.zip
+   echo 'export PATH=$PATH:/opt/gradle/gradle-6.7.1/bin' | sudo tee -a /home/vagrant/.bashrc
+   echo 'export PATH=$PATH:/opt/gradle/gradle-6.7.1/bin' | sudo tee -a /root/.bashrc
+   source ~/.bashrc
+   
+   # Specify database location and credentials in application.properties
+   echo "spring.datasource.url=jdbc:mysql://localhost:3306/e4l" | sudo tee -a /lu.uni.e4l.platform.api.dev/src/main/resources/application.properties
+   echo "spring.datasource.username=root" | sudo tee -a /lu.uni.e4l.platform.api.dev/src/main/resources/application.properties
+   echo "spring.datasource.password=12345678" | sudo tee -a /lu.uni.e4l.platform.api.dev/src/main/resources/application.properties
+   echo "spring.datasource.url=jdbc:mysql://localhost:3306/e4l?serverTimezone=UTC" | sudo tee -a /lu.uni.e4l.platform.api.dev/src/main/resources/application.properties
+   
+   # Create the database "e4l" in MySQL
+   mysql -u root -p12345678 -e "CREATE DATABASE e4l;"
+
+   sudo apt-get install --yes python
+
+
+   
+   
 
 
     sudo cp /home/vagrant/shared/production.sh /home/vagrant/production.sh
