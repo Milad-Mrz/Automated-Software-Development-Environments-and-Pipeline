@@ -31,7 +31,7 @@ The run.sh script is a Bash script for setting up and initializing a development
 
 4. Initialize Developer and CI Server:The script launches two separate instances of gnome-terminal to run scripts (1_dev_env.sh and 2_ci_server.sh) in the background.
 
-5. Check CI Server Status:It checks the status of the CI server by making HTTP requests to a specified URL (http://192.168.56.9/gitlab/users/sign_in). It waits until the server returns an HTTP status code of 200 (OK), indicating that the CI server is running.
+5. Check CI Server Status:It checks the status of the CI server by making HTTP requests to a specified URL (http://192.168.33.9/gitlab/users/sign_in). It waits until the server returns an HTTP status code of 200 (OK), indicating that the CI server is running.
 
 6. Initialize Staging Environment:Another gnome-terminal instance is launched to run a script (3_stg_env.sh) that presumably sets up the staging environment.
 
