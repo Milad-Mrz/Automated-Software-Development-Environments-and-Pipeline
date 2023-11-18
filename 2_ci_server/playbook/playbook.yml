@@ -18,7 +18,7 @@
 
     - include_role:
         name: docker
-    # Configure GitLab
+    
     - name: Edit /etc/gitlab/gitlab.rb
       lineinfile:
         path: /etc/gitlab/gitlab.rb
@@ -54,12 +54,6 @@
         path: /home/vagrant/shared/frontend
         state: directory
         mode: '0777'
-
-    - name: Create flag file in vagrant_data
-      shell: sudo echo "0" > /home/vagrant/shared/flag_staging
-
-    - name: Create flag file in vagrant_data
-      shell: chmod 777 /home/vagrant/shared/flag_staging
 
     - name: Run the gitlab configuration script.
       command: sh /home/vagrant/scripts/configure-gitlab.sh
@@ -113,5 +107,5 @@
       shell: sudo addgroup gitlab-runner vagrant
 
     - name: Run the repository setup script 2
-      command: sh /home/vagrant/scripts/setup-repository.sh
+      command: sh /home/vagrant/scripts/setup-repository-2.sh
 

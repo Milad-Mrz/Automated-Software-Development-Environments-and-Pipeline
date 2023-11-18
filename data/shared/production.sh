@@ -1,28 +1,27 @@
 #!/bin/bash
 
 # Step 1: Use a while loop to repeatedly to check the flag_production
-FLAG_FILE="/home/vagrant/shared/flag_production"
+FLAG="/home/vagrant/shared/flag_production"
 Product_url="http://192.168.56.97:8107"
 http_status=""
+flag_content="0"
 
 clear
 
 #sudo touch "/home/vagrant/shared/flag_production"
 echo -e "Production Env:\n\n"
 echo "checking production flag..."
-
+        
 while true; do
     # Read the content of the flag file
-    if [ -e "$FLAG_FILE" ]; then
+    if [ -e "$FLAG" ]; then
     # File exists, read its content
-        flag_content=$(cat "$FLAG_FILE")
-    else
-    # File doesn't exist, set flag_content to zero or any other default value
-        flag_content=0
+        flag_content=$(cat "$FLAG")
     fi
 
     # Check if the content is equal to "1"
     if [ "$flag_content" == "1" ]; then
+        flag_content="0"
         # update the jar file and restart the product
         echo "restart ports, back-end and front-end"        
         # back-end
@@ -62,16 +61,17 @@ while true; do
         while true; do
             http_status=$(curl -s -o /dev/null -w "%{http_code}" $Product_url)
             if [ "$http_status" == "200" ] ; then
+                echo -e " \n\n" 
                 echo -e " \n\n"
                 echo -e " \n\n"
-                echo "product is running. LINK: $Product_url"
+                echo -e " \n\n"
+                echo "product is running:"
+                echo "LINK: $Product_url"
                 echo -e " \n\n"
                 echo -e " \n\n"
-                # Echo "0" back into the flag file
-                #sudo echo "0" > "/home/vagrant/shared/flag_production"
-                echo "Flag set to 0."
-                sudo rm "/home/vagrant/shared/flag_production"
-
+                echo -e " \n\n"
+                sudo rm /home/vagrant/shared/flag_production
+                sudo rm -r /home/vagrant/shared/frontend
                 break
             else        
                 sleep 5

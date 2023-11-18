@@ -30,7 +30,7 @@ gnome-terminal -- bash -c './scripts/2_ci_server.sh; exec bash'  &
 Product_url="http://192.168.56.9/gitlab/users/sign_in"
 http_status=""
 
-echo "Waiting for the CI server to start... (~30 min)"
+echo "Waiting for the CI server to start... (~20 min)"
 
 # Use a while loop to repeatedly check if the Product is running
 while true; do
@@ -45,7 +45,7 @@ while true; do
 done
 
 
-echo "Initialising all environments... (~15 min)"
+echo "Initialising all environments... (~10 min)"
 # Initialising Developer env.	--------------------------------------------
 echo "1-Developer env."
 gnome-terminal -- bash -c './scripts/1_dev_env.sh; exec bash'  &

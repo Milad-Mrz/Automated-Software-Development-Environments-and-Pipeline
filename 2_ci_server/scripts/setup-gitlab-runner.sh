@@ -58,6 +58,7 @@ frontend_deploy:
     tags:
     - integration-shell
     script:
+    - mkdir /home/vagrant/shared/frontend
     - cp -rf lu.uni.e4l.platform.frontend.dev/e4l.frontend/web/dist/* /home/vagrant/shared/frontend
 
 

@@ -31,7 +31,7 @@ To execute the project, use the following Bash command:
 
 __bash______________________________________________________________
 
-./run.sh
+./0_run.sh
 ____________________________________________________________________
 
 The `run.sh` script automates the setup with the following steps:
@@ -45,7 +45,7 @@ The `run.sh` script automates the setup with the following steps:
 To stop the project and clean up ports, use the following command:
 
 ```bash
-./close.sh
+./0_close.sh
 ```
 
 The `close.sh` script turns off running Vagrant virtual machines and restarts the ports (8080 to 8088) in case they were not closed properly.
